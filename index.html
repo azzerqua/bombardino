@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <title>Bombardiro Battle</title>
+  <title>Bombardino Battle</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
   <style>
     :root {
       --card-width: 22vw;
@@ -21,7 +22,7 @@
     }
     
     body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: 'Fredoka One', cursive;
       background: #1e1e1e;
       color: #fff;
       margin: 0;
@@ -39,9 +40,9 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      height: 100%;
+      height: calc(100% - 50px);
       margin: 0 auto;
-      max-width: 800px;
+      max-width: 500px;
       position: relative;
     }
     
@@ -169,16 +170,18 @@
       font-size: 16px;
     }
     
-    .card-effect {
-      font-size: 10px;
-      color: #BDBDBD;
-      margin-top: 5px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-    }
+.card-effect {
+  font-size: 10px;
+  color: #BDBDBD;
+  margin-top: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2; /* <- Add this line */
+  -webkit-box-orient: vertical;
+}
+
     
     .mana-cost {
       position: absolute;
@@ -196,20 +199,24 @@
       font-size: 12px;
     }
     
-    .hp-bar {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 5px;
-      background: #F44336;
-    }
-    
-    .hp-bar-fill {
-      height: 100%;
-      background: #4CAF50;
-    }
-    
+
+.ultimate-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: #333;
+  border-radius: 0 0 6px 6px;
+  z-index: 2;
+}
+
+.ultimate-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #9C27B0, #E91E63);
+  border-radius: 0 0 6px 6px;
+  transition: width 0.3s ease;
+}
     .hand-container {
       height: var(--hand-height);
       width: 100%;
@@ -362,6 +369,24 @@
       transform: scale(1.05);
     }
     
+    /* Animation d'attaque */
+    .attack-animation {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FF5722"><path d="M12 2L4 12l8 10 8-10z"/></svg>') no-repeat center;
+      background-size: contain;
+      animation: attackMove 0.5s forwards;
+      z-index: 100;
+      pointer-events: none;
+    }
+    
+    @keyframes attackMove {
+      0% { transform: scale(0.5); opacity: 0; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.5); opacity: 0; }
+    }
+    
     @media (min-width: 600px) {
       :root {
         --card-width: 18vw;
@@ -414,6 +439,129 @@
         font-size: 12px;
       }
     }
+
+    
+    .selected-card {
+      border: 3px solid #FFEB3B;
+      box-shadow: 0 0 15px #FFEB3B;
+      transform: scale(1.1);
+      transition: all 0.2s;
+      z-index: 10;
+    }
+
+    .playable-card {
+      border: 2px solid #4CAF50;
+      box-shadow: 0 0 10px #4CAF50;
+    }
+
+    .attackable-player {
+      border: 3px solid #F44336 !important;
+      box-shadow: 0 0 15px #F44336 !important;
+   
+    }
+
+
+
+    .used-card {
+      opacity: 0.6;
+      filter: grayscale(50%);
+    }
+
+    
+    .selected-board-card {
+      border: 3px solid #FF9800;
+      box-shadow: 0 0 15px #FF9800;
+      transform: scale(1.05);
+      z-index: 10;
+    }
+
+    .unusable-card {
+      opacity: 0.6;
+      filter: grayscale(70%);
+      cursor: not-allowed;
+    }
+
+    .attackable {
+      border: 3px solid #F44336 !important;
+      box-shadow: 0 0 15px #F44336 !important;
+      animation: pulse 1s infinite;
+    }
+
+    .attack-animation {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FF5722"><path d="M12 2L4 12l8 10 8-10z"/></svg>') no-repeat center;
+  background-size: contain;
+  animation: attackMove 0.5s forwards;
+  z-index: 100;
+  pointer-events: none;
+  transform-origin: center;
+}
+
+@keyframes attackMove {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  50% { transform: translate(var(--tx), var(--ty)) scale(1.2); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0.5); opacity: 0; }
+}
+
+.slot.attackable {
+  border: 3px solid #F44336 !important;
+  box-shadow: 0 0 15px #F44336 !important;
+  animation: pulse 1s infinite;
+  cursor: pointer;
+}
+
+#enemy-hp.attackable-player {
+  border: 3px solid #F44336 !important;
+  box-shadow: 0 0 15px #F44336 !important;
+  animation: pulse 1s infinite;
+}
+
+/* Animation de stabilisation des cartes */
+.card {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.card-destroyed {
+  transform: scale(0);
+  opacity: 0;
+  transition: all 0.5s ease;
+}
+
+/* Garder les cartes ennemies stables */
+.enemy-zone .card {
+  pointer-events: none; /* Empêcher l'interaction directe */
+}
+
+/* Ajoutez dans le style */
+.btn-ultimate {
+  background: #9C27B0;
+  color: white;
+}
+
+.btn-ultimate:hover {
+  background: #7B1FA2;
+}
+
+.card-ready-for-ultimate {
+  border: 3px solid #2196F3;
+  box-shadow: 0 0 15px #2196F3;
+  animation: pulse-blue 1s infinite;
+}
+
+@keyframes pulse-blue {
+  0% { box-shadow: 0 0 5px #2196F3; }
+  50% { box-shadow: 0 0 20px #2196F3; }
+  100% { box-shadow: 0 0 5px #2196F3; }
+}
+
+.card {
+  position: relative;
+  padding-bottom: 8px; /* Espace pour la barre d'ulti */
+}
+
+
   </style>
 </head>
 <body>
@@ -444,13 +592,11 @@
 
   <div class="controls">
     <button class="btn btn-secondary" id="draw-btn" onclick="drawCard()">Piocher (3✨)</button>
+    <button class="btn btn-ultimate" id="ultimate-btn" onclick="useUltimate()" disabled>Ulti (2✨)</button>
     <button class="btn btn-primary" id="end-turn-btn" onclick="endTurn()">Fin du tour</button>
   </div>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js');
-    }
     // État du jeu
     const gameState = {
       player: { 
@@ -461,16 +607,19 @@
         hand: [], 
         board: Array(4).fill(null),
         selectedCard: null,
-        selectedAttacker: null
+        selectedAttacker: null,
+        exhaustedCards: [] // Cartes qui ont déjà attaqué ce tour
       },
       enemy: { 
         hp: 20, 
         mana: 1, 
         maxMana: 1, 
-        board: Array(4).fill(null) 
+        board: Array(4).fill(null),
+        exhaustedCards: [] // Cartes qui ont déjà attaqué ce tour
       },
       turn: 'player',
-      turnCount: 0
+      canPlayCards: true,
+      ultimateReady: null // Index de la carte prête à ulti
     };
 
     // Bibliothèque de cartes
@@ -485,7 +634,16 @@
         frontEffect: "Attaque l'ennemi avec 3 ATK",
         backEffect: "Donne +1 ATK à toutes vos autres créatures",
         frontLogic: (attacker, target) => basicAttack(attacker, target),
-        backLogic: (card, board) => buffAllies(board, 1, 0)
+        backLogic: (card, board) => buffAllies(board, 1, 0),
+        ultimate: {
+    cost: 2, // Coût en mana
+    turnsNeeded: 3, // Tours nécessaires avant activation
+    effect: "Inflige 1 dégât à tous les adversaires",
+    execute: (card, board) => {
+      gameState.enemy.board.forEach(c => c && (c.hp -= 1));
+      gameState.enemy.hp -= 1;
+    }
+  }
       },
       { 
         id: 2,
@@ -532,68 +690,157 @@
       },
       {
         id: 4,
-        name: "Poulpe Pirate",
-        hp: 4,
-        atk: 2,
-        cost: 4,
-        effect: "Un poulpe avec un bandeau et un crochet",
-        frontEffect: "Attaque deux fois de suite",
-        backEffect: "Vole 1 mana à l'ennemi",
+        name: "Mage Tourbillon", 
+        hp: 3, 
+        atk: 2, 
+        cost: 4, 
+        effect: "Invoque une tornade qui affecte toutes les cartes",
+        frontEffect: "Inflige 1 dégât à toutes les cartes ennemies",
+        backEffect: "Soigne 1 PV à toutes vos cartes",
         frontLogic: (attacker, target) => {
-          basicAttack(attacker, target);
-          basicAttack(attacker, target);
+          gameState.enemy.board.forEach(card => {
+            if (card) card.hp -= 1;
+          });
         },
         backLogic: (card, board) => {
-          if (gameState.enemy.mana > 0) {
-            gameState.enemy.mana--;
-            gameState.player.mana++;
-            updateUI();
-          }
-        }
-      },
-      {
-        id: 5,
-        name: "Mouton Nucléaire",
-        hp: 6,
-        atk: 1,
-        cost: 5,
-        effect: "Un mouton avec une aura radioactive",
-        frontEffect: "Explose en infligeant 2 dégâts à toutes les cartes ennemies (détruit cette carte)",
-        backEffect: "Donne +2 PV à toutes vos autres créatures",
-        frontLogic: (attacker, target) => {
-          // Dégâts à toutes les cartes ennemies
-          gameState.enemy.board.forEach((card, index) => {
-            if (card) {
-              card.hp -= 2;
-              if (card.hp <= 0) {
-                gameState.enemy.board[index] = null;
-              }
-            }
+          board.forEach(card => {
+            if (card) card.hp = Math.min(card.hp + 1, card.hp + 5); // +5 est le HP de base
           });
-          // Détruit cette carte
-          const slotIndex = gameState.player.board.indexOf(attacker);
-          gameState.player.board[slotIndex] = null;
-          renderBoard();
-        },
-        backLogic: (card, board) => buffAllies(board, 0, 2)
+        }
       }
     ];
 
     // Effets de base
-    function basicAttack(attacker, target) {
+    function basicAttack(attacker, target, callback) {
       if (!target) {
         // Attaque directe du joueur
-        gameState.enemy.hp -= attacker.atk;
-        if (gameState.enemy.hp <= 0) endGame("Victoire !");
+        createAttackAnimation(attacker, null, () => {
+          gameState.enemy.hp -= attacker.atk;
+          if (gameState.enemy.hp <= 0) endGame("Victoire !");
+          updateUI();
+          if (callback) callback();
+        });
       } else {
         // Attaque une carte
-        target.hp -= attacker.atk;
-        if (target.hp <= 0) {
-          const index = gameState.enemy.board.indexOf(target);
-          gameState.enemy.board[index] = null;
+        createAttackAnimation(attacker, target, () => {
+          target.hp -= attacker.atk;
+          if (target.hp <= 0) {
+            const index = gameState.enemy.board.indexOf(target);
+            gameState.enemy.board[index] = null;
+          }
+          updateUI();
+          if (callback) callback();
+        });
+      }
+    }
+
+    
+
+    function updateUltimateProgress() {
+  // Pour le joueur
+  gameState.player.board.forEach(card => {
+    if (card && card.ultimate) {
+      if (!card.ultimateProgress) card.ultimateProgress = 0;
+      card.ultimateProgress++;
+    }
+  });
+
+  // Pour l'ennemi
+  gameState.enemy.board.forEach(card => {
+    if (card && card.ultimate) {
+      if (!card.ultimateProgress) card.ultimateProgress = 0;
+      card.ultimateProgress++;
+    }
+  });
+}
+
+function useUltimate() {
+  if (gameState.ultimateReady === null) return;
+  
+  const card = gameState.player.board[gameState.ultimateReady];
+  if (card && card.ultimate) {
+    // Vérifiez le mana
+    if (gameState.player.mana < card.ultimate.cost) {
+      alert(`Pas assez de mana (nécessite ${card.ultimate.cost})`);
+      return;
+    }
+    
+    gameState.player.mana -= card.ultimate.cost;
+    card.ultimate.execute(card, gameState.player.board);
+    card.ultimateProgress = 0;
+    gameState.ultimateReady = null;
+    document.getElementById('ultimate-btn').disabled = true;
+    updateUI();
+    renderBoard();
+  }
+}
+
+    function createAttackAnimation(attacker, target, callback) {
+  const attackerEl = findCardElement(attacker);
+  if (!attackerEl) {
+    if (callback) callback();
+    return;
+  }
+  
+  const attackerRect = attackerEl.getBoundingClientRect();
+  const animation = document.createElement('div');
+  animation.className = 'attack-animation';
+  animation.style.left = (attackerRect.left + attackerRect.width/2 - 25) + 'px';
+  animation.style.top = (attackerRect.top + attackerRect.height/2 - 25) + 'px';
+  document.body.appendChild(animation);
+  
+  let targetRect;
+  
+  if (target) {
+    // Attaque une carte
+    const targetEl = findCardElement(target);
+    if (targetEl) {
+      targetRect = targetEl.getBoundingClientRect();
+    }
+  } else {
+    // Attaque directe du joueur
+    // CIBLE CORRIGÉE : On prend la zone de vie du joueur attaqué
+    const targetHpEl = (gameState.turn === 'player') 
+      ? document.getElementById('enemy-hp').parentElement 
+      : document.getElementById('player-hp').parentElement;
+    
+    targetRect = targetHpEl.getBoundingClientRect();
+  }
+  
+  // Animation vers la cible
+  if (targetRect) {
+    animation.style.left = (targetRect.left + targetRect.width/2 - 25) + 'px';
+    animation.style.top = (targetRect.top + targetRect.height/2 - 25) + 'px';
+  }
+  
+  setTimeout(() => {
+    animation.remove();
+    if (callback) callback();
+  }, 500);
+}
+
+    function findCardElement(card) {
+      // Cherche dans la zone joueur
+      for (let i = 0; i < gameState.player.board.length; i++) {
+        if (gameState.player.board[i] === card) {
+          const zone = document.getElementById('player-zone');
+          if (zone && zone.children[i]) {
+            return zone.children[i].querySelector('.card');
+          }
         }
       }
-      updateUI();
+      
+      // Cherche dans la zone ennemie
+      for (let i = 0; i < gameState.enemy.board.length; i++) {
+        if (gameState.enemy.board[i] === card) {
+          const zone = document.getElementById('enemy-zone');
+          if (zone && zone.children[i]) {
+            return zone.children[i].querySelector('.card');
+          }
+        }
+      }
+      
+      return null;
     }
 
     function buffAllies(board, atkBuff, hpBuff) {
@@ -638,6 +885,9 @@
       for (let i = 0; i < 3; i++) {
         drawCardToHand();
       }
+
+      gameState.player.exhaustedCards = [];
+      gameState.enemy.exhaustedCards = [];
       
       updateUI();
       renderBoard();
@@ -677,22 +927,23 @@
     }
 
     function selectCard(index) {
-      if (gameState.turn !== 'player') return;
-      
-      // Désélectionner si on clique sur la même carte
-      if (gameState.player.selectedCard === index) {
-        gameState.player.selectedCard = null;
-        hideCardDetails();
-        clearHighlights();
-        renderHand();
-        return;
-      }
-      
-      gameState.player.selectedCard = index;
-      showCardDetails(gameState.player.hand[index]);
-      highlightAvailableSlots();
-      renderHand();
-    }
+  // Vérifier si les interactions sont autorisées
+  if (gameState.turn !== 'player' || !gameState.canPlayCards) return;
+  
+  // Désélectionner si on clique sur la même carte
+  if (gameState.player.selectedCard === index) {
+    gameState.player.selectedCard = null;
+    hideCardDetails();
+    clearHighlights();
+    renderHand();
+    return;
+  }
+  
+  gameState.player.selectedCard = index;
+  showCardDetails(gameState.player.hand[index]);
+  highlightAvailableSlots();
+  renderHand();
+}
 
     function showCardDetails(card) {
       const detailsEl = document.getElementById('card-details');
@@ -724,6 +975,15 @@
           </div>
         </div>
       `;
+      if (card.ultimate) {
+  detailsEl.innerHTML += `
+    <div class="ultimate-details">
+      <h4>ULTIMATE (${card.ultimate.cost}✨)</h4>
+      <p>${card.ultimate.effect}</p>
+      <p>Charge en ${card.ultimate.turnsNeeded-1} tours</p>
+    </div>
+  `;
+}
       detailsEl.classList.add('active');
     }
 
@@ -735,6 +995,7 @@
       if (gameState.turn !== 'player') return;
       if (gameState.player.selectedCard === null) return;
       if (gameState.player.board[slotIndex] !== null) return;
+      if (!gameState.canPlayCards) return;
       
       const card = gameState.player.hand[gameState.player.selectedCard];
       
@@ -744,7 +1005,15 @@
       }
       
       gameState.player.mana -= card.cost;
-      gameState.player.board[slotIndex] = {...card};
+      
+      // Créer une nouvelle carte avec la propriété "canAttack" à false
+      const newCard = {
+        ...card,
+        canAttack: false, // Ne peut pas attaquer le tour où elle est posée
+        ultimateProgress: 0 // <-- Initialiser la progression d'ulti
+      };
+      
+      gameState.player.board[slotIndex] = newCard;
       gameState.player.hand.splice(gameState.player.selectedCard, 1);
       
       gameState.player.selectedCard = null;
@@ -756,55 +1025,114 @@
     }
 
     function selectAttacker(slotIndex) {
-      if (gameState.turn !== 'player') return;
-      if (gameState.player.board[slotIndex] === null) return;
-      
-      gameState.player.selectedAttacker = slotIndex;
-      highlightAttackTargets();
+  if (gameState.turn !== 'player') return;
+  if (gameState.player.board[slotIndex] === null) return;
+  
+  const card = gameState.player.board[slotIndex];
+  
+  // Vérifier si la carte peut attaquer
+  if (!card.canAttack || gameState.player.exhaustedCards.includes(slotIndex)) {
+    return;
+  }
+
+  // Si la carte a son ulti prêt
+  if (card?.ultimateProgress >= card?.ultimate?.turnsNeeded) {
+    gameState.ultimateReady = slotIndex;
+    document.getElementById('ultimate-btn').disabled = false;
+    renderBoard();
+    return;
+  }
+  
+  // Désélectionner si on clique sur la même carte
+  if (gameState.player.selectedAttacker === slotIndex) {
+    gameState.player.selectedAttacker = null;
+    clearHighlights();
+    renderBoard();
+    renderHand(); // Ajouter cette ligne pour rafraîchir l'affichage
+    return;
+  }
+  
+  gameState.player.selectedAttacker = slotIndex;
+  highlightAttackTargets();
+  renderBoard();
+  renderHand(); // Ajouter cette ligne pour cohérence
+}
+function highlightAttackTargets() {
+  clearHighlights();
+  
+  gameState.enemy.board.forEach((slot, index) => {
+    if (slot !== null) { // Supprimer la vérification exhaustedCards
+      const enemyZone = document.getElementById('enemy-zone');
+      if (enemyZone && enemyZone.children[index]) {
+        enemyZone.children[index].classList.add('attackable');
+      }
+    }
+  });
+
+  gameState.enemy.board.forEach((enemyCard, index) => {
+    if (enemyCard) {
+      const enemyZone = document.getElementById('enemy-zone');
+      if (enemyZone && enemyZone.children[index]) {
+        enemyZone.children[index].classList.add('attackable');
+      }
+    }
+  });
+
+  // Activer l'attaque directe si front
+  if (gameState.player.selectedAttacker < 2) {
+    document.getElementById('enemy-hp').parentElement.classList.add('attackable-player');
+  }
+}
+
+
+function attack(targetIndex) {
+  if (gameState.turn !== 'player') return;
+  if (gameState.player.selectedAttacker === null) return;
+
+  const attackerIndex = gameState.player.selectedAttacker;
+  const attacker = gameState.player.board[attackerIndex];
+  if (!attacker) return;
+
+  gameState.canPlayCards = false;
+  gameState.player.exhaustedCards.push(attackerIndex);
+
+  let target = null;
+  let isDirectAttack = false;
+  
+  if (typeof targetIndex === 'number') {
+    target = gameState.enemy.board[targetIndex];
+  } else {
+    isDirectAttack = true;
+  }
+
+  const position = attackerIndex < 2 ? 'front' : 'back';
+
+  const resolveAttack = () => {
+    if (position === 'front') {
+      if (isDirectAttack) {
+        gameState.enemy.hp = Math.max(0, gameState.enemy.hp - attacker.atk);
+      } else if (target) {
+        target.hp -= attacker.atk;
+      }
     }
 
-    function highlightAttackTargets() {
-      // Réinitialiser les highlights
-      clearHighlights();
-      
-      // Mettre en évidence les cibles possibles
-      gameState.enemy.board.forEach((slot, index) => {
-        if (slot !== null) {
-          document.getElementById('enemy-zone').children[index].classList.add('attackable');
-        }
-      });
-      
-      // Ajouter aussi le joueur ennemi comme cible
-      document.getElementById('enemy-hp').parentElement.classList.add('attackable');
+    // Appliquer les effets de position arrière même pour les attaques
+    if (position === 'back' && attacker.backLogic) {
+      attacker.backLogic(attacker, gameState.player.board);
     }
 
-    function attack(targetIndex) {
-      if (gameState.turn !== 'player') return;
-      if (gameState.player.selectedAttacker === null) return;
-      
-      const attacker = gameState.player.board[gameState.player.selectedAttacker];
-      if (!attacker) return;
-      
-      let target = null;
-      if (targetIndex !== undefined && targetIndex !== null) {
-        target = gameState.enemy.board[targetIndex];
-      }
-      
-      // Déterminer la position de la carte (avant ou arrière)
-      const position = gameState.player.selectedAttacker < 2 ? 'front' : 'back';
-      
-      // Appliquer l'effet selon la position
-      if (position === 'front') {
-        attacker.frontLogic(attacker, target);
-      } else {
-        attacker.backLogic(attacker, gameState.player.board);
-      }
-      
-      gameState.player.selectedAttacker = null;
-      clearHighlights();
-      renderBoard();
-      updateUI();
-    }
+    // Nettoyer les cartes détruites
+    gameState.enemy.board = gameState.enemy.board.map(card => 
+      card && card.hp > 0 ? card : null
+    );
+
+    updateGameState(true);
+    gameState.player.selectedAttacker = null;
+    gameState.canPlayCards = true;
+  };
+
+  createAttackAnimation(attacker, target, resolveAttack);
+}
 
     function highlightAvailableSlots() {
       // Réinitialiser les highlights
@@ -819,10 +1147,12 @@
     }
 
     function clearHighlights() {
-      document.querySelectorAll('.highlight, .attackable, .placeable').forEach(el => {
-        el.classList.remove('highlight', 'attackable', 'placeable');
-      });
-    }
+  // Réinitialiser tous les highlights
+  document.querySelectorAll('.highlight, .placeable, .selected-board-card, .attackable, .attackable-player').forEach(el => {
+    el.classList.remove('highlight', 'placeable', 'selected-board-card', 'attackable', 'attackable-player');
+  });
+}
+
 
     function endTurn() {
       if (gameState.turn !== 'player') return;
@@ -833,6 +1163,12 @@
           card.backLogic(card, gameState.player.board);
         }
       });
+
+
+
+      
+      // Réinitialiser les cartes épuisées
+      gameState.player.exhaustedCards = [];
       
       // Passer au tour de l'ennemi
       gameState.turn = 'enemy';
@@ -844,6 +1180,9 @@
         gameState.enemy.maxMana++;
       }
       gameState.enemy.mana = gameState.enemy.maxMana;
+
+
+    
       
       updateUI();
       
@@ -851,91 +1190,149 @@
       setTimeout(enemyTurn, 1000);
     }
 
+
     function enemyTurn() {
-      // L'IA simple :
-      // 1. Pioche si possible (33% de chance)
-      if (Math.random() < 0.33 && gameState.enemy.mana >= 3) {
-        gameState.enemy.mana -= 3;
-        // L'IA a un deck infini pour simplifier
+  // Activer les attaques pour les cartes ennemies
+  gameState.enemy.board.forEach((card, index) => {
+    if (card) {
+      card.canAttack = true;
+      
+      // Gestion de l'ulti pour l'IA
+      if (card.ultimate && 
+          card.ultimateProgress >= card.ultimate.turnsNeeded &&
+          gameState.enemy.mana >= card.ultimate.cost) {
+        card.ultimate.execute(card, gameState.enemy.board);
+        gameState.enemy.mana -= card.ultimate.cost;
+        card.ultimateProgress = 0;
       }
-      
-      // 2. Pose des cartes aléatoirement
-      const playableCards = [
-        {id: 1, cost: 3}, // Croco-Choc
-        {id: 2, cost: 2}, // Banane Boomerang
-        {id: 3, cost: 1}  // Tralala Mystère
-      ];
-      
-      while (gameState.enemy.mana > 0) {
-        const availableSlots = [];
-        gameState.enemy.board.forEach((slot, index) => {
-          if (slot === null) availableSlots.push(index);
-        });
-        
-        if (availableSlots.length === 0) break;
-        
-        const randomCard = playableCards[Math.floor(Math.random() * playableCards.length)];
-        if (gameState.enemy.mana >= randomCard.cost) {
-          const slotIndex = availableSlots[Math.floor(Math.random() * availableSlots.length)];
-          gameState.enemy.board[slotIndex] = {
-            ...cardsLibrary.find(c => c.id === randomCard.id)
-          };
-          gameState.enemy.mana -= randomCard.cost;
-        } else {
-          break;
-        }
-      }
-      
-      // 3. Attaque avec les cartes
-      gameState.enemy.board.forEach((card, index) => {
-        if (card) {
-          // 50% de chance d'attaquer avec chaque carte
-          if (Math.random() < 0.5) {
-            const position = index < 2 ? 'front' : 'back';
-            if (position === 'front') {
-              // Choisir une cible aléatoire
-              const playerCards = gameState.player.board.filter(c => c !== null);
-              if (playerCards.length > 0) {
-                const target = playerCards[Math.floor(Math.random() * playerCards.length)];
-                card.frontLogic(card, target);
-              } else {
-                // Attaque directe
-                card.frontLogic(card, null);
-              }
-            } else {
-              card.backLogic(card, gameState.enemy.board);
-            }
-          }
-        }
-      });
-      
-      renderBoard();
-      updateUI();
-      
-      // Fin du tour de l'ennemi
-      setTimeout(() => {
-        startPlayerTurn();
-      }, 1000);
+    }
+  });
+
+  // Réinitialiser les cartes épuisées
+  gameState.enemy.exhaustedCards = [];
+
+  // 1. Pioche si possible
+  if (Math.random() < 0.33 && gameState.enemy.mana >= 3) {
+    gameState.enemy.mana -= 3;
+    // L'IA pioche une carte (simplifié)
+  }
+
+  // 2. Pose des cartes
+  const playableCards = [
+    {id: 1, cost: 3},
+    {id: 2, cost: 2},
+    {id: 3, cost: 1}
+  ];
+
+  let attempts = 0;
+  while (gameState.enemy.mana > 0 && attempts < 5) {
+    attempts++;
+    const availableSlots = gameState.enemy.board.map((slot, i) => slot === null ? i : null).filter(val => val !== null);
+    
+    if (availableSlots.length === 0) break;
+    
+    const randomCard = playableCards[Math.floor(Math.random() * playableCards.length)];
+    if (gameState.enemy.mana >= randomCard.cost) {
+      const slotIndex = availableSlots[Math.floor(Math.random() * availableSlots.length)];
+      gameState.enemy.board[slotIndex] = {
+        ...cardsLibrary.find(c => c.id === randomCard.id),
+        canAttack: false // Ne peut pas attaquer ce tour-ci
+      };
+      gameState.enemy.mana -= randomCard.cost;
+    }
+  }
+
+  // 3. Attaques
+  const attackingCards = [];
+  gameState.enemy.board.forEach((card, index) => {
+    if (card && card.canAttack && !gameState.enemy.exhaustedCards.includes(index)) {
+      attackingCards.push(index);
+    }
+  });
+
+  if (attackingCards.length === 0) {
+    setTimeout(startPlayerTurn, 1000);
+    return;
+  }
+
+  // Exécuter les attaques une par une
+  const executeAttack = (index) => {
+    if (index >= attackingCards.length) {
+      setTimeout(startPlayerTurn, 1000);
+      return;
     }
 
-    function startPlayerTurn() {
-      gameState.turn = 'player';
-      document.getElementById('turn-indicator').textContent = "VOTRE TOUR";
-      document.getElementById('turn-indicator').className = 'turn-indicator player-turn';
+    const slotIndex = attackingCards[index];
+    const attacker = gameState.enemy.board[slotIndex];
+    gameState.enemy.exhaustedCards.push(slotIndex);
+
+    if (slotIndex < 2) { // Position avant
+      // Choisir une cible aléatoire
+      const playerCards = gameState.player.board.filter(c => c !== null);
+      let target = null;
       
-      // Augmenter le mana max si besoin
-      if (gameState.player.maxMana < 10) {
-        gameState.player.maxMana++;
+      if (playerCards.length > 0 && Math.random() > 0.3) {
+        target = playerCards[Math.floor(Math.random() * playerCards.length)];
       }
-      gameState.player.mana = gameState.player.maxMana;
-      
-      // Pioche automatique en début de tour
-      if (gameState.player.hand.length < 5 && gameState.player.deck.length > 0) {
-        drawCardToHand();
-      }
-      
-      updateUI();
+
+      createAttackAnimation(attacker, target, () => {
+        if (target) {
+          target.hp -= attacker.atk;
+          if (target.hp <= 0) {
+            const targetIndex = gameState.player.board.indexOf(target);
+            gameState.player.board[targetIndex] = null;
+          }
+        } else {
+          gameState.player.hp -= attacker.atk;
+          if (gameState.player.hp <= 0) endGame("Défaite !");
+        }
+        
+        updateUI();
+        renderBoard();
+        executeAttack(index + 1);
+      });
+    } else {
+  // Attaque directe
+  createAttackAnimation(attacker, null, () => {
+    gameState.player.hp -= attacker.atk;
+    if (gameState.player.hp <= 0) endGame("Défaite !");
+    updateUI();
+    executeAttack(index + 1);
+  });
+}
+  };
+
+  executeAttack(0);
+}
+
+function startPlayerTurn() {
+  updateUltimateProgress(); // <-- Ajoutez cette ligne
+
+  gameState.turn = 'player';
+  
+  // Réinitialiser le mana
+  if (gameState.player.maxMana < 10) {
+    gameState.player.maxMana++;
+  }
+  gameState.player.mana = gameState.player.maxMana; // Cette ligne était manquante
+  
+  // Réinitialiser les cartes alliées
+  gameState.player.board.forEach((card, index) => {
+    if (card) {
+      card.canAttack = true;
+      gameState.player.exhaustedCards = gameState.player.exhaustedCards.filter(i => i !== index);
     }
+  });
+
+    // Pioche automatique en début de tour
+    if (gameState.player.hand.length < 5 && gameState.player.deck.length > 0) {
+    drawCardToHand();
+  }
+
+  updateGameState(true);
+  document.getElementById('turn-indicator').className = 'turn-indicator player-turn';
+  document.getElementById('turn-indicator').textContent = "VOTRE TOUR";
+}
 
     function endGame(message) {
       alert(message);
@@ -948,7 +1345,8 @@
         hand: [], 
         board: Array(4).fill(null),
         selectedCard: null,
-        selectedAttacker: null
+        selectedAttacker: null,
+        canPlayCards: true
       };
       gameState.enemy = { 
         hp: 20, 
@@ -966,73 +1364,164 @@
     }
 
     function renderZone(zoneId, board, type) {
-      const zone = document.getElementById(zoneId);
-      zone.innerHTML = '';
-      
-      board.forEach((card, index) => {
-        const slot = document.createElement('div');
-        slot.className = `slot ${type}`;
-        
-        if (card) {
-          const cardEl = document.createElement('div');
-          cardEl.className = 'card';
-          cardEl.innerHTML = `
-            <div class="mana-cost">${card.cost}</div>
-            <div class="card-name">${card.name}</div>
-            <div class="card-stats">
-              <div class="card-stat">
-                <div>ATK</div>
-                <div class="card-stat-value">${card.atk}</div>
-              </div>
-              <div class="card-stat">
-                <div>HP</div>
-                <div class="card-stat-value">${card.hp}</div>
-              </div>
-            </div>
-            <div class="card-effect">${card.effect}</div>
-            <div class="hp-bar">
-              <div class="hp-bar-fill" style="width: ${(card.hp / (card.hp + 5)) * 100}%"></div>
-            </div>
-          `;
+  const zone = document.getElementById(zoneId);
+  zone.innerHTML = '';
+
+  board.forEach((card, index) => {
+    const slot = document.createElement('div');
+    slot.className = `slot ${type}`;
+
+    // Détermine la position (inversée pour l'ennemi)
+    let positionIndex = index;
+    if (type === 'enemy') {
+      positionIndex = (index < 2) ? index + 2 : index - 2;
+    }
+    
+    if (!card) {
+      const positionIcon = document.createElement('div');
+      positionIcon.className = 'position-icon';
+      positionIcon.textContent = positionIndex < 2 ? '🛡️' : '🏹';
+      slot.appendChild(positionIcon);
+    }
+    if (card) {
+      const cardEl = document.createElement('div');
+      cardEl.className = 'card';
+
+      // Ajouter la jauge d'ulti si la carte en a une
+      if (card.ultimate) {
           
-          if (type === 'ally' && gameState.turn === 'player') {
-            slot.onclick = () => {
-              if (gameState.player.selectedAttacker !== null) {
-                // Annuler la sélection si on clique sur la même carte
-                if (gameState.player.selectedAttacker === index) {
-                  gameState.player.selectedAttacker = null;
-                  clearHighlights();
-                }
-              } else {
-                selectAttacker(index);
-              }
-            };
+
+
+          // Mettre en évidence si l'ulti est prêt
+          if (card.ultimateProgress >= card.ultimate.turnsNeeded) {
+            cardEl.classList.add('card-ready-for-ultimate');
           }
-          
-          slot.appendChild(cardEl);
-        } else if (type === 'ally' && gameState.turn === 'player') {
+        }
+
+      // Highlight selected card (ally only)
+      if (type === 'ally' && gameState.player.selectedAttacker === index) {
+        cardEl.classList.add('selected-board-card');
+      }
+
+      // Ally cards that can't attack
+      if (type === 'ally' && (!card.canAttack || gameState.player.exhaustedCards.includes(index))) {
+        cardEl.classList.add('unusable-card');
+      }
+
+  // Construire tout le HTML en une fois
+  let cardHTML = `
+    <div class="mana-cost">${card.cost}</div>
+    <div class="card-name">${card.name}</div>
+    <div class="card-stats">
+      <div class="card-stat">
+        <div>ATK</div>
+        <div class="card-stat-value">${card.atk}</div>
+      </div>
+      <div class="card-stat">
+        <div>HP</div>
+        <div class="card-stat-value">${card.hp}</div>
+      </div>
+    </div>
+  `;
+
+  // Ajouter la barre d'ulti si nécessaire
+  if (card.ultimate) {
+    const progress = Math.min(100, (card.ultimateProgress / card.ultimate.turnsNeeded) * 100);
+    cardHTML += `
+      <div class="ultimate-progress">
+        <div class="ultimate-progress-fill" style="width: ${progress}%"></div>
+      </div>
+    `;
+  }
+
+  cardEl.innerHTML = cardHTML;
+
+      // Ally card click handling
+      if (type === 'ally') {
+        if (gameState.turn === 'player' && card.canAttack && !gameState.player.exhaustedCards.includes(index)) {
           slot.onclick = () => {
-            if (gameState.player.selectedCard !== null) {
-              placeCard(index);
-            }
-          };
-        } else if (type === 'enemy' && gameState.player.selectedAttacker !== null && gameState.turn === 'player') {
-          slot.onclick = () => {
-            attack(index);
+            selectAttacker(index);
+            updateGameState();
           };
         }
-        
-        zone.appendChild(slot);
-      });
-      
-      // Ajouter la possibilité d'attaquer directement le joueur
-      if (type === 'enemy' && gameState.player.selectedAttacker !== null && gameState.turn === 'player') {
-        const enemyHpEl = document.getElementById('enemy-hp').parentElement;
-        enemyHpEl.onclick = () => {
-          attack(null); // Attaque directe
-        };
       }
+
+      slot.appendChild(cardEl);
+    } else if (type === 'ally' && gameState.turn === 'player') {
+      // Empty ally slot
+      slot.onclick = () => {
+        if (gameState.player.selectedCard !== null) {
+          placeCard(index);
+          updateGameState();
+        }
+      };
     }
+
+    // Enemy card click handling
+    if (type === 'enemy' && card && gameState.player.selectedAttacker !== null && gameState.turn === 'player') {
+      slot.onclick = () => {
+        attack(index);
+        updateGameState();
+      };
+    }
+    if (type === 'enemy' && card && gameState.player.selectedAttacker !== null) {
+  slot.onclick = () => {
+    attack(index);
+    updateGameState();
+  };
+  if (gameState.turn === 'player') {
+    slot.classList.add('attackable');
+  }
+}
+
+    zone.appendChild(slot);
+  });
+
+  // Direct attack handling
+  if (type === 'enemy') {
+    const enemyHpEl = document.getElementById('enemy-hp').parentElement;
+    if (gameState.player.selectedAttacker !== null && gameState.turn === 'player' && 
+        gameState.player.selectedAttacker < 2) {
+      enemyHpEl.onclick = () => {
+        attack(null);
+        updateGameState();
+      };
+      enemyHpEl.classList.add('attackable-player');
+    } else {
+      enemyHpEl.onclick = null;
+      enemyHpEl.classList.remove('attackable-player');
+    }
+  }
+}
+
+// Nouvelle fonction pour mettre à jour l'état du jeu
+function updateGameState(forceRender = false) {
+  // Nettoyer les cartes détruites
+  gameState.player.board = gameState.player.board.map(card => {
+    if (!card) return null;
+    return card.hp > 0 ? card : null;
+  });
+
+  gameState.enemy.board = gameState.enemy.board.map(card => {
+    if (!card) return null;
+    return card.hp > 0 ? card : null;
+  });
+
+  // Mise à jour conditionnelle du rendu
+  if (forceRender || Date.now() - lastRender > 100) {
+    renderBoard();
+    renderHand();
+    updateUI();
+    lastRender = Date.now();
+  }
+
+  // Vérifier les conditions de victoire
+  if (gameState.player.hp <= 0) endGame("Défaite !");
+  if (gameState.enemy.hp <= 0) endGame("Victoire !");
+}
+
+let lastRender = 0;
+
 
     function renderHand() {
       const handEl = document.getElementById('hand');
@@ -1041,9 +1530,17 @@
       gameState.player.hand.forEach((card, index) => {
         const cardEl = document.createElement('div');
         cardEl.className = 'card hand-card';
+        
+        // Mise en surbrillance de la carte sélectionnée
         if (gameState.player.selectedCard === index) {
           cardEl.classList.add('selected-card');
         }
+        
+        // Indicateur visuel pour les cartes jouables
+        if (gameState.player.mana >= card.cost) {
+          cardEl.classList.add('playable-card');
+        }
+        
         cardEl.innerHTML = `
           <div class="mana-cost">${card.cost}</div>
           <div class="card-name">${card.name}</div>
@@ -1092,3 +1589,5 @@
   </script>
 </body>
 </html>
+
+
