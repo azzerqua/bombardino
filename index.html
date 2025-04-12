@@ -23,7 +23,8 @@
     
     body {
       font-family: 'Fredoka One', cursive;
-      background: #1e1e1e;
+      background-image:url("img/hq720_2.jpg");
+
       color: #fff;
       margin: 0;
       padding: 0;
@@ -33,6 +34,7 @@
       display: flex;
       flex-direction: column;
       position: fixed;
+    
     }
     
     .game-container {
@@ -51,7 +53,7 @@
       justify-content: space-between;
       width: 100%;
       padding: 8px 10px;
-      background: #333;
+      background: #45b3f3a6;
       font-size: 14px;
       flex-shrink: 0;
     }
@@ -88,10 +90,12 @@
       gap: 8px;
       padding: 0 8px;
       min-height: calc(var(--card-height) + 10px);
+      place-items: center; /* Ajout pour centrer les slots */
+      justify-content: center; /* Centre horizontalement */
     }
     
     .slot {
-      background: #555;
+      background: #d0ecff85;
       border: 2px solid transparent;
       border-radius: 8px;
       display: flex;
@@ -250,7 +254,7 @@
       justify-content: space-between;
       width: 100%;
       padding: 8px;
-      background: #333;
+      background: #001f2aae;
       flex-shrink: 0;
     }
     
@@ -293,7 +297,7 @@
       top: 50px;
       left: 0;
       right: 0;
-      background: rgba(51, 51, 51, 0.9);
+      background: rgba(65, 126, 187, 0.9);
       padding: 10px;
       z-index: 50;
       border-bottom: 2px solid #FFC107;
@@ -356,6 +360,27 @@
       font-size: 14px;
     }
     
+
+
+    .ultimate-details {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    
+    .ultimate-details {
+      flex: 0 0 48%;
+      padding: 8px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    
+    .ultimate-details h4 {
+      margin: 0 0 5px 0;
+      color: #c144ff;
+      font-size: 14px;
+    }
     .position-effect.front h4::before {
       content: "🛡️ ";
     }
@@ -561,10 +586,42 @@
   padding-bottom: 8px; /* Espace pour la barre d'ulti */
 }
 
+@media (max-width: 600px) {
+  .card {
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  
+  .card-content {
+    background: rgba(0, 0, 0, 0.8);
+  }
+}
 
+
+
+.card-content {
+  position: relative;
+  z-index: 2; /* Place le contenu au-dessus de l'image de fond */
+  background: rgba(0, 0, 0, 0.6); /* Fond semi-transparent pour le texte */
+  height: 100%;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #FF5722, #FFC107);
+  z-index: 3;
+}
   </style>
 </head>
-<body>
+<body style="padding-bottom: 4%;">
   <div class="turn-indicator player-turn" id="turn-indicator">VOTRE TOUR</div>
   
   <div class="card-details" id="card-details"></div>
@@ -626,11 +683,12 @@
     const cardsLibrary = [
       { 
         id: 1,
-        name: "Croco-Choc", 
+        name: "Bombardino Crocodillo", 
         hp: 5, 
         atk: 3, 
         cost: 3, 
-        effect: "Une créature redoutable avec des effets différents selon sa position",
+        effect: " un fottuto alligatore volante",
+        bgImage: "url('icon-512.png')",
         frontEffect: "Attaque l'ennemi avec 3 ATK",
         backEffect: "Donne +1 ATK à toutes vos autres créatures",
         frontLogic: (attacker, target) => basicAttack(attacker, target),
@@ -647,11 +705,12 @@
       },
       { 
         id: 2,
-        name: "Banane Boomerang", 
+        name: "Lirilì Larilà", 
         hp: 2, 
         atk: 2, 
         cost: 2, 
-        effect: "Une banane qui revient toujours vers son propriétaire",
+        effect: "elefante nel deserto che cammina qua e là",
+        bgImage: "url('img/Lirili_rili_ralila.webp')",
         frontEffect: "Inflige 2 dégâts et pioche 1 carte",
         backEffect: "Soigne 1 PV à votre joueur",
         frontLogic: (attacker, target) => {
@@ -664,11 +723,12 @@
       },
       { 
         id: 3,
-        name: "Tralala Mystère", 
+        name: "Trippi Troppi", 
         hp: 1, 
         atk: 1, 
         cost: 1, 
-        effect: "Personne ne sait ce qu'il va faire, pas même lui !",
+        effect: "Trippi troppi, troppa trippa, tre topi trotterellano tra tromboni tritati",
+        bgImage: "url('img/640.webp')",
         frontEffect: "Effet aléatoire: attaque, soin ou buff",
         backEffect: "Effet aléatoire: soin, buff ou dégâts",
         frontLogic: (attacker, target) => {
@@ -690,11 +750,12 @@
       },
       {
         id: 4,
-        name: "Mage Tourbillon", 
+        name: "Tralalero Tralala", 
         hp: 3, 
         atk: 2, 
         cost: 4, 
-        effect: "Invoque une tornade qui affecte toutes les cartes",
+        effect: "Trallallero Trallalla, porco dio porco allah",
+        bgImage: "url('img/Tralalero_tralala.webp')",
         frontEffect: "Inflige 1 dégât à toutes les cartes ennemies",
         backEffect: "Soigne 1 PV à toutes vos cartes",
         frontLogic: (attacker, target) => {
@@ -707,11 +768,231 @@
             if (card) card.hp = Math.min(card.hp + 1, card.hp + 5); // +5 est le HP de base
           });
         }
+      },
+
+  
+  { 
+    id: 5,
+    name: "Brr brr Patapim", 
+    hp: 6, 
+    atk: 1, 
+    cost: 2, 
+    effect: "il mio cappello è pieno di Slim! Nel bosco fitto e misterioso viveva un essere assai curioso.",
+    bgImage: "url('img/Brr_Brr_Patapim.webp')",
+    frontEffect: "Bloque 1 dégât reçu par les autres cartes",
+    backEffect: "Soigne 1 PV à une carte aléatoire à la fin du tour",
+    frontLogic: (attacker, target) => basicAttack(attacker, target),
+    backLogic: (card, board) => {
+      const aliveCards = board.filter(c => c && c.hp > 0);
+      if (aliveCards.length > 0) {
+        const randomCard = aliveCards[Math.floor(Math.random() * aliveCards.length)];
+        randomCard.hp += 1;
       }
-    ];
+    },
+    ultimate: {
+      cost: 1,
+      turnsNeeded: 2,
+      effect: "Soigne 2 PV à toutes vos cartes",
+      execute: (card, board) => board.forEach(c => c && (c.hp += 2))
+    }
+  },
+
+  { 
+    id: 6,
+    name: "Frulli Frulla", 
+    hp: 2, 
+    atk: 4, 
+    cost: 4, 
+    effect: "Frulli Frulla",
+    frontEffect: "Attaque deux fois mais ne peut pas attaquer le tour où il est posé",
+    bgImage: "url('img/Frulli_Frulla.webp')",
+    backEffect: "Attaque une fois par tour",
+    frontLogic: (attacker, target) => {
+      basicAttack(attacker, target);
+      setTimeout(() => basicAttack(attacker, target), 300);
+    },
+    backLogic: (card, board) => {}, // Pas d'effet en position arrière
+    ultimate: {
+      cost: 3,
+      turnsNeeded: 1,
+      effect: "Inflige 5 dégâts à une cible aléatoire",
+      execute: (card, board) => {
+        const targets = [...gameState.enemy.board.filter(c => c), {hp: gameState.enemy.hp}];
+        const target = targets[Math.floor(Math.random() * targets.length)];
+        target.hp -= 5;
+      }
+    }
+  },
+
+  { 
+    id: 7,
+    name: "Bobritto bandito", 
+    hp: 1, 
+    atk: 1, 
+    cost: 1, 
+    effect: "Bobritto Bandito is a beaver bandit with a black jacket, black glasses and a hat.",
+    bgImage: "url('img/Bomborito_bandito.webp')",
+    frontEffect: "Révèle une carte ennemie aléatoire (montre ses PV/ATK)",
+    backEffect: "Pioche 1 carte supplémentaire si survit au tour",
+    frontLogic: (attacker, target) => {
+      // Effet visuel uniquement (serait à implémenter dans l'UI)
+      basicAttack(attacker, target);
+    },
+    backLogic: (card, board) => {
+      if (gameState.player.hand.length < 5) {
+        drawCardToHand();
+      }
+    }
+  },
+
+  { 
+    id: 8,
+    name: "Glorbo Fruttodrillo", 
+    hp: 8, 
+    atk: 0, 
+    cost: 3, 
+    effect: "glorbo fruttodrillo nel profondo della Palude glorbo frutt drillo regnava il suo corpo era un'enorme anguria a strisce ",
+    bgImage: "url('img/Glorbofruttodrillo.webp')",
+    frontEffect: "Réduit de 1 les dégâts reçus par vos autres cartes",
+    backEffect: "Gagne +2 HP à la fin du tour",
+    frontLogic: (attacker, target) => {}, // Effet passif
+    backLogic: (card, board) => card.hp += 2
+  },
+
+  { 
+    id: 9,
+    name: "Tung tung tung sahur", 
+    hp: 3, 
+    atk: 5, 
+    cost: 5, 
+    effect: "Tung tung tung tung sahur. Anomali mengerikan yang hanya keluar pada sahur. ",
+    bgImage: "url('img/Anomali_tung_tung_tung.png')",
+    frontEffect: "50% de chance d'attaquer deux fois, 50% de rater",
+    backEffect: "Inflige 1 dégât à une cible aléatoire à la fin du tour",
+    frontLogic: (attacker, target) => {
+      if (Math.random() > 0.5) {
+        basicAttack(attacker, target);
+        setTimeout(() => basicAttack(attacker, target), 300);
+      }
+    },
+    backLogic: (card, board) => {
+      const targets = [...gameState.enemy.board.filter(c => c), {hp: gameState.enemy.hp}];
+      const target = targets[Math.floor(Math.random() * targets.length)];
+      target.hp -= 1;
+    }
+  },
+
+  { 
+    id: 10,
+    name: "Burbaloni Luliloli", 
+    hp: 4, 
+    atk: 1, 
+    cost: 3, 
+    effect: "Burr baloni luli loli, capibarello cocossini, è molto raro trovare sulle coste di bali",
+    bgImage: "url('img/Burbaloni.webp')",
+    frontEffect: "Soigne 1 PV à votre joueur après avoir attaqué",
+    backEffect: "Soigne 2 PV à une carte aléatoire à la fin du tour",
+    frontLogic: (attacker, target) => {
+      basicAttack(attacker, target);
+      healPlayer(1);
+    },
+    backLogic: (card, board) => {
+      const aliveCards = board.filter(c => c && c.hp > 0);
+      if (aliveCards.length > 0) {
+        const randomCard = aliveCards[Math.floor(Math.random() * aliveCards.length)];
+        randomCard.hp += 2;
+      }
+    }
+  },
+
+  { 
+    id: 11,
+    name: "Bombombini Gusini", 
+    hp: 2, 
+    atk: 2, 
+    cost: 4, 
+    effect: "bombombini gusini fratello bombardiro crocodilo che svolge tutte le stesse funzioni del fratello e dà bombe alla gente.",
+    bgImage: "url('img/Bombombini_Gusini.webp')",
+    frontEffect: "Attaque normalement",
+    backEffect: "Si mort, invoque une copie d'une carte alliée aléatoire",
+    frontLogic: (attacker, target) => basicAttack(attacker, target),
+    backLogic: (card, board) => {}, // Effet géré dans la destruction
+    onDestroy: (card, board) => {
+      const aliveCards = board.filter(c => c && c.hp > 0);
+      if (aliveCards.length > 0) {
+        const randomCard = aliveCards[Math.floor(Math.random() * aliveCards.length)];
+        const emptySlot = board.findIndex(c => !c);
+        if (emptySlot !== -1) {
+          board[emptySlot] = {...randomCard, hp: 1};
+        }
+      }
+    }
+  },
+
+  { 
+    id: 12,
+    name: "Ballerina Capuchina", 
+    hp: 1, 
+    atk: 0, 
+    cost: 2, 
+    effect: "Ballerina Capuchina, mi mi mi miiii. È la moglie di Capuchino Assassino.",
+    bgImage: "url('img/BallerinaCapuchina.webp')",
+    frontEffect: "50% de chance d'éviter les attaques",
+    backEffect: "L'ennemi a 25% de chance de rater ses attaques",
+    frontLogic: (attacker, target) => {}, // Effet passif
+    backLogic: (card, board) => {} // Effet passif
+  },
+
+  { 
+    id: 13,
+    name: "Capuchino Assassino", 
+    hp: 7, 
+    atk: 7, 
+    cost: 6, 
+    effect: " Cappuccino Assassino is extremely fast",
+    bgImage: "url('img/Hq720.jpg')",
+    frontEffect: "Attaque une carte aléatoire (alliée ou ennemie)",
+    backEffect: "Inflige 2 dégâts à toutes les cartes à la fin du tour",
+    frontLogic: (attacker, target) => {
+      const allCards = [...gameState.player.board, ...gameState.enemy.board].filter(c => c);
+      const randomTarget = allCards[Math.floor(Math.random() * allCards.length)];
+      basicAttack(attacker, randomTarget);
+    },
+    backLogic: (card, board) => {
+      gameState.player.board.forEach(c => c && (c.hp -= 2));
+      gameState.enemy.board.forEach(c => c && (c.hp -= 2));
+    }
+  },
+
+  { 
+    id: 14,
+    name: "Trulimero Trulicina", 
+    hp: 5, 
+    atk: 3, 
+    cost: 5, 
+    effect: "trulimero trulichima, il pretiletine in piscina, formaggio sulla trulalima, ma chi chiama la tazzina?",
+    bgImage: "url('img/Trulimero_Trulichina.webp')",
+    frontEffect: "Donne +1 ATK à toutes les autres cartes",
+    backEffect: "Pioche 1 carte à la fin du tour",
+    frontLogic: (attacker, target) => {
+      buffAllies(gameState.player.board, 1, 0);
+      basicAttack(attacker, target);
+    },
+    backLogic: (card, board) => {
+      if (gameState.player.hand.length < 5) {
+        drawCardToHand();
+      }
+    }
+  }
+];
+    
 
     // Effets de base
     function basicAttack(attacker, target, callback) {
+      if (target && target.name === "Mirage Melon" && Math.random() < 0.5) {
+    if (callback) callback();
+    return;
+  }
       if (!target) {
         // Attaque directe du joueur
         createAttackAnimation(attacker, null, () => {
@@ -725,6 +1006,9 @@
         createAttackAnimation(attacker, target, () => {
           target.hp -= attacker.atk;
           if (target.hp <= 0) {
+            if (target.onDestroy) {
+    target.onDestroy(target, gameState.enemy.board);
+  }
             const index = gameState.enemy.board.indexOf(target);
             gameState.enemy.board[index] = null;
           }
@@ -1407,7 +1691,10 @@ function startPlayerTurn() {
       if (type === 'ally' && (!card.canAttack || gameState.player.exhaustedCards.includes(index))) {
         cardEl.classList.add('unusable-card');
       }
-
+  // Style d'arrière-plan dynamique
+  cardEl.style.backgroundImage = card.bgImage || 'linear-gradient(135deg, #444 0%, #333 100%)';
+  cardEl.style.backgroundSize = 'cover';
+  cardEl.style.backgroundPosition = 'center';
   // Construire tout le HTML en une fois
   let cardHTML = `
     <div class="mana-cost">${card.cost}</div>
@@ -1540,7 +1827,10 @@ let lastRender = 0;
         if (gameState.player.mana >= card.cost) {
           cardEl.classList.add('playable-card');
         }
-        
+          // Style d'arrière-plan dynamique
+  cardEl.style.backgroundImage = card.bgImage || 'linear-gradient(135deg, #444 0%, #333 100%)';
+  cardEl.style.backgroundSize = 'cover';
+  cardEl.style.backgroundPosition = 'center';
         cardEl.innerHTML = `
           <div class="mana-cost">${card.cost}</div>
           <div class="card-name">${card.name}</div>
