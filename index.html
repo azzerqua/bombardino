@@ -619,9 +619,12 @@
   background: linear-gradient(90deg, #FF5722, #FFC107);
   z-index: 3;
 }
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+}
   </style>
 </head>
-<body style="padding-bottom: 4%;">
+<body>
   <div class="turn-indicator player-turn" id="turn-indicator">VOTRE TOUR</div>
   
   <div class="card-details" id="card-details"></div>
