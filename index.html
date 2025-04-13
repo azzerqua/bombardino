@@ -24,6 +24,9 @@
     body {
       font-family: 'Fredoka One', cursive;
       background-image:url("img/hq720_2.jpg");
+      background-size: auto 100vh;
+
+      
 
       color: #fff;
       margin: 0;
@@ -52,7 +55,7 @@
       display: flex;
       justify-content: space-between;
       width: 100%;
-      padding: 8px 10px;
+      padding: 1% 10px;
       background: #45b3f3a6;
       font-size: 14px;
       flex-shrink: 0;
@@ -271,11 +274,6 @@
     .btn-primary {
       background: #4CAF50;
       color: white;
-    }
-
-        .btn-hide {
-      background: #00000000;
-      color: #00000000;
     }
     
     .btn-primary:hover {
@@ -624,8 +622,262 @@
   background: linear-gradient(90deg, #FF5722, #FFC107);
   z-index: 3;
 }
-.ios-safe-area {
-  display: none;
+
+
+/* Modifications dans la section <style> */
+
+  body {
+  /* ... garder les styles existants ... */
+  min-height: 100vh;
+  overflow-y: auto; /* Permettre le défilement vertical */
+}
+
+.game-container {
+  flex: 1;
+  width: min(100%, 700px); /* Largeur max absolue */
+  height: calc(100vh - 160px); /* Hauteur basée sur viewport */
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+
+/* Nouveau système de cartes responsive */
+:root {
+  --card-width: min(20vw, 20vh); /* Basé sur la plus petite dimension */
+  --card-height: calc(var(--card-width) * 1.4);
+  --hand-height: calc(var(--card-height) * 0.8);
+}
+
+/* Conteneur principal avec espace réservé */
+.board {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: calc(var(--hand-height) + 60px); /* Réserve l'espace */
+}
+
+/* Contrôles toujours visibles */
+
+
+/* Ajustements pour grands écrans */
+@media (min-aspect-ratio: 16/9) {
+  :root {
+    --card-width: min(15vw, 15vh);
+  }
+  
+  .zone {
+    gap: 2px;
+    padding: 2px;
+  }
+  
+  .card-name {
+    font-size: 11px !important;
+  }
+}
+
+/* Pour les écrans carrés/portrait */
+@media (max-aspect-ratio: 3/4) {
+  :root {
+    --card-width: 22vw;
+  }
+  
+  .game-container {
+    height: calc(100vh - 120px);
+  }
+  
+
+}
+
+/* Empêcher l'agrandissement excessif */
+.card {
+  max-width: auto;
+  max-height: auto;
+}
+
+/* Garantir la visibilité des slots */
+.slot {
+  min-width: 50px;
+  min-height: 70px;
+}
+
+/* Nouveau style unifié pour la barre de contrôle */
+.controls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  padding-bottom: 4%;
+  background: rgba(4, 137, 186, 0.748);
+  z-index: 200;
+  backdrop-filter: blur(2px);
+}
+
+/* Conteneur des infos joueur */
+.player-info {
+  display: flex;
+  flex-direction: column;
+  margin-right: auto;
+  padding-right: 10px;
+  min-width: 100px;
+}
+
+/* Ajustement des boutons */
+.btn {
+  flex: 1;
+  min-width: 80px;
+  max-width: 120px;
+  margin: 0 4px;
+  padding: 8px 5px;
+  font-size: 14px;
+}
+.hand-container {
+  position: fixed;
+  bottom: 7%; /* Hauteur des contrôles */
+  left: 0;
+  right: 0;
+  height: var(--hand-height);
+  z-index: 100;
+
+}
+/* Version mobile */
+@media (max-width: 500px) {
+  .player-info {
+    font-size: 14px;
+    min-width: 80px;
+  }
+  
+  .btn {
+    min-width: 70px;
+    font-size: 12px;
+    padding: 6px 3px;
+  }
+  /* Conteneur de la main */
+  .hand-container {
+  position: fixed;
+  bottom: 8%; /* Hauteur des contrôles */
+  left: 0;
+  right: 0;
+  height: var(--hand-height);
+  z-index: 100;
+
+}
+}
+
+
+
+* Nouveau système de grille responsive */
+.board {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 5px;
+  overflow-y: auto;
+}
+
+/* Conteneur des zones */
+.zones-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Adaptation intelligente selon le ratio */
+@media (orientation: portrait) {
+  .zones-container {
+    flex-direction: column;
+  }
+  
+  .zone {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (orientation: landscape) {
+  .zones-container {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .zone {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Zones individuelles */
+.zone {
+  display: grid;
+  gap: 5px;
+  padding: 5px;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Cases dynamiques */
+.slot {
+  aspect-ratio: 2/3;
+  min-width: 60px;
+  min-height: 90px;
+  max-width: 150px;
+  max-height: 225px;
+  width: 100%;
+  height: 100%;
+}
+
+/* Mode paysage haute résolution */
+@media (min-aspect-ratio: 16/9) and (min-height: 500px) {
+  .zones-container {
+    flex-direction: row;
+  }
+  
+  .zone {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .slot {
+    max-width: 200px;
+    max-height: 300px;
+  }
+}
+
+/* Mode portrait serré */
+@media (max-aspect-ratio: 3/4) {
+  .zone {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .slot {
+    min-width: 40px;
+    min-height: 60px;
+  }
+}
+
+/* Conteneur principal */
+.game-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Gestion du débordement */
+.board {
+  scrollbar-width: thin;
+  scrollbar-color: #45b3f3 transparent;
+}
+
+.board::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.board::-webkit-scrollbar-thumb {
+  background: #45b33f;
+  border-radius: 10px;
 }
 
 
@@ -641,31 +893,30 @@
     <div>Mana: <span id="enemy-mana">1</span>/10 ✨</div>
   </div>
 
-  <div class="game-container">
-    <div class="board">
+  <div class="board">
+    <div class="zones-container">
       <div class="zone enemy-zone" id="enemy-zone"></div>
       <div class="zone player-zone" id="player-zone"></div>
     </div>
+  </div>
     
     <div class="hand-container">
       <div class="hand" id="hand"></div>
     </div>
   </div>
   
-  <div class="ui-bar">
-    <div>Vous: <span id="player-hp">20</span> ❤️</div>
-    <div>Mana: <span id="player-mana">1</span>/10 ✨</div>
+  <div class="controls">
+    <div class="player-info">
+      <div>❤️ <span id="player-hp">20</span></div>
+      <div>✨ <span id="player-mana">1</span>/10</div>
+    </div>
+    
+    <button class="btn btn-secondary" id="draw-btn" onclick="drawCard()">Piocher (3✨)</button>
+    <button class="btn btn-ultimate" id="ultimate-btn" onclick="useUltimate()" disabled>Ulti (2✨)</button>
+    <button class="btn btn-primary" id="end-turn-btn" onclick="endTurn()">Fin du tour</button>
+    
   </div>
 
- 
-    <div class="controls">
-      <button class="btn btn-secondary" id="draw-btn" onclick="drawCard()">Piocher (3✨)</button>
-      <button class="btn btn-ultimate" id="ultimate-btn" onclick="useUltimate()" disabled>Ulti (2✨)</button>
-      <button class="btn btn-primary" id="end-turn-btn" onclick="endTurn()">Fin du tour</button>
-    </div>
-    <div class="controls">
-     <button class="btn btn-hide">........................</button>
-    </div>
 
 
 
