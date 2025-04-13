@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <title>Bombardino Battle</title>
+  <title>Brainrot Battle</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
@@ -619,6 +619,11 @@
   background: linear-gradient(90deg, #FF5722, #FFC107);
   z-index: 3;
 }
+.ios-safe-area {
+  display: none;
+}
+
+
   </style>
 </head>
 <body>
@@ -647,12 +652,17 @@
     <div>Mana: <span id="player-mana">1</span>/10 ✨</div>
   </div>
 
-  <div class="controls">
-    <button class="btn btn-secondary" id="draw-btn" onclick="drawCard()">Piocher (3✨)</button>
-    <button class="btn btn-ultimate" id="ultimate-btn" onclick="useUltimate()" disabled>Ulti (2✨)</button>
-    <button class="btn btn-primary" id="end-turn-btn" onclick="endTurn()">Fin du tour</button>
-  </div>
-  <div style="padding: 3%"></div>
+ 
+    <div class="controls">
+      <button class="btn btn-secondary" id="draw-btn" onclick="drawCard()">Piocher (3✨)</button>
+      <button class="btn btn-ultimate" id="ultimate-btn" onclick="useUltimate()" disabled>Ulti (2✨)</button>
+      <button class="btn btn-primary" id="end-turn-btn" onclick="endTurn()">Fin du tour</button>
+    </div>
+    <div class="controls">
+     
+    </div>
+
+
 
   <script>
     // État du jeu
@@ -689,7 +699,7 @@
         atk: 3, 
         cost: 3, 
         effect: " un fottuto alligatore volante",
-        bgImage: "url('icon-512.png')",
+        bgImage: "url('img/bombardino.png')",
         frontEffect: "Attaque l'ennemi avec 3 ATK",
         backEffect: "Donne +1 ATK à toutes vos autres créatures",
         frontLogic: (attacker, target) => basicAttack(attacker, target),
@@ -1459,6 +1469,12 @@ function attack(targetIndex) {
       gameState.turn = 'enemy';
       document.getElementById('turn-indicator').textContent = "TOUR DE L'ENNEMI";
       document.getElementById('turn-indicator').className = 'turn-indicator enemy-turn';
+      // Après le tour de l'ennemi, appliquer ses effets de support
+    gameState.enemy.board.forEach((card, index) => {
+        if (card && index >= 2) { // Cartes en arrière
+            card.backLogic(card, gameState.enemy.board);
+        }
+    });
       
       // Augmenter le mana max si besoin
       if (gameState.enemy.maxMana < 10) {
@@ -1477,117 +1493,121 @@ function attack(targetIndex) {
 
 
     function enemyTurn() {
-  // Activer les attaques pour les cartes ennemies
-  gameState.enemy.board.forEach((card, index) => {
-    if (card) {
-      card.canAttack = true;
-      
-      // Gestion de l'ulti pour l'IA
-      if (card.ultimate && 
-          card.ultimateProgress >= card.ultimate.turnsNeeded &&
-          gameState.enemy.mana >= card.ultimate.cost) {
-        card.ultimate.execute(card, gameState.enemy.board);
-        gameState.enemy.mana -= card.ultimate.cost;
-        card.ultimateProgress = 0;
-      }
-    }
-  });
+    // Phase 1: Gestion des cartes spéciales et ulti
+    gameState.enemy.board.forEach((card, index) => {
+        if (card && card.ultimate) {
+            // Vérifier si l'ulti est prête
+            if (card.ultimateProgress >= card.ultimate.turnsNeeded &&
+                gameState.enemy.mana >= card.ultimate.cost) {
+                card.ultimate.execute(card, gameState.enemy.board);
+                gameState.enemy.mana -= card.ultimate.cost;
+                card.ultimateProgress = 0;
+            }
+        }
+    });
 
-  // Réinitialiser les cartes épuisées
-  gameState.enemy.exhaustedCards = [];
+    // Phase 2: Placement stratégique des cartes
+    const playableCards = cardsLibrary.filter(c => c.cost <= gameState.enemy.mana);
+    let attempts = 0;
 
-  // 1. Pioche si possible
-  if (Math.random() < 0.33 && gameState.enemy.mana >= 3) {
-    gameState.enemy.mana -= 3;
-    // L'IA pioche une carte (simplifié)
-  }
+    // Trier les cartes par priorité (coût élevé d'abord)
+    playableCards.sort((a, b) => b.cost - a.cost);
 
-  // 2. Pose des cartes
-  const playableCards = [
-    {id: 1, cost: 3},
-    {id: 2, cost: 2},
-    {id: 3, cost: 1}
-  ];
+    while (playableCards.length > 0 && attempts < 5 && gameState.enemy.mana > 0) {
+        const card = playableCards.shift();
+        const availableSlots = gameState.enemy.board
+            .map((slot, i) => slot === null ? i : null)
+            .filter(val => val !== null);
 
-  let attempts = 0;
-  while (gameState.enemy.mana > 0 && attempts < 5) {
-    attempts++;
-    const availableSlots = gameState.enemy.board.map((slot, i) => slot === null ? i : null).filter(val => val !== null);
-    
-    if (availableSlots.length === 0) break;
-    
-    const randomCard = playableCards[Math.floor(Math.random() * playableCards.length)];
-    if (gameState.enemy.mana >= randomCard.cost) {
-      const slotIndex = availableSlots[Math.floor(Math.random() * availableSlots.length)];
-      gameState.enemy.board[slotIndex] = {
-        ...cardsLibrary.find(c => c.id === randomCard.id),
-        canAttack: false // Ne peut pas attaquer ce tour-ci
-      };
-      gameState.enemy.mana -= randomCard.cost;
-    }
-  }
+        if (availableSlots.length === 0) break;
 
-  // 3. Attaques
-  const attackingCards = [];
-  gameState.enemy.board.forEach((card, index) => {
-    if (card && card.canAttack && !gameState.enemy.exhaustedCards.includes(index)) {
-      attackingCards.push(index);
-    }
-  });
+        // Stratégie de placement :
+        // - Cartes avec ATK élevé devant (slots 0-1)
+        // - Cartes de support derrière (slots 2-3)
+        const preferredSlots = card.atk > card.hp ? [0, 1] : [2, 3];
+        const validSlots = availableSlots.filter(s => preferredSlots.includes(s));
 
-  if (attackingCards.length === 0) {
-    setTimeout(startPlayerTurn, 1000);
-    return;
-  }
+        const slotIndex = validSlots.length > 0 ? 
+            validSlots[Math.floor(Math.random() * validSlots.length)] :
+            availableSlots[Math.floor(Math.random() * availableSlots.length)];
 
-  // Exécuter les attaques une par une
-  const executeAttack = (index) => {
-    if (index >= attackingCards.length) {
-      setTimeout(startPlayerTurn, 1000);
-      return;
-    }
-
-    const slotIndex = attackingCards[index];
-    const attacker = gameState.enemy.board[slotIndex];
-    gameState.enemy.exhaustedCards.push(slotIndex);
-
-    if (slotIndex < 2) { // Position avant
-      // Choisir une cible aléatoire
-      const playerCards = gameState.player.board.filter(c => c !== null);
-      let target = null;
-      
-      if (playerCards.length > 0 && Math.random() > 0.3) {
-        target = playerCards[Math.floor(Math.random() * playerCards.length)];
-      }
-
-      createAttackAnimation(attacker, target, () => {
-        if (target) {
-          target.hp -= attacker.atk;
-          if (target.hp <= 0) {
-            const targetIndex = gameState.player.board.indexOf(target);
-            gameState.player.board[targetIndex] = null;
-          }
-        } else {
-          gameState.player.hp -= attacker.atk;
-          if (gameState.player.hp <= 0) endGame("Défaite !");
+        if (Math.random() < 0.7) { // 70% de chance de jouer la carte
+            gameState.enemy.board[slotIndex] = {
+                ...card,
+                canAttack: false,
+                ultimateProgress: 0
+            };
+            gameState.enemy.mana -= card.cost;
         }
         
-        updateUI();
-        renderBoard();
-        executeAttack(index + 1);
-      });
-    } else {
-  // Attaque directe
-  createAttackAnimation(attacker, null, () => {
-    gameState.player.hp -= attacker.atk;
-    if (gameState.player.hp <= 0) endGame("Défaite !");
-    updateUI();
-    executeAttack(index + 1);
-  });
-}
-  };
+        attempts++;
+    }
 
-  executeAttack(0);
+    // Phase 3: Attaques stratégiques
+    const attackingCards = gameState.enemy.board
+        .map((card, index) => ({card, index}))
+        .filter(({card}) => card && card.canAttack)
+        .sort((a, b) => {
+            // Priorité aux cartes frontales et ATK élevé
+            const aScore = (a.index < 2 ? 2 : 0) + a.card.atk;
+            const bScore = (b.index < 2 ? 2 : 0) + b.card.atk;
+            return bScore - aScore;
+        });
+
+    // Exécuter les attaques de manière stratégique
+    const executeStrategicAttack = (index = 0) => {
+        if (index >= attackingCards.length) {
+            // Phase 4: Activation des effets de support
+            gameState.enemy.board.forEach((card, i) => {
+                if (card && i >= 2) { // Cartes en arrière
+                    card.backLogic?.(card, gameState.enemy.board);
+                }
+            });
+            setTimeout(startPlayerTurn, 1000);
+            return;
+        }
+
+        const {card, index: slotIndex} = attackingCards[index];
+        gameState.enemy.exhaustedCards.push(slotIndex);
+
+        let target = null;
+        if (slotIndex < 2) { // Position avant
+            // Cibler les cartes faibles ou attaquer directement
+            const validTargets = gameState.player.board
+                .filter(c => c !== null && c.hp <= card.atk);
+            
+            if (validTargets.length > 0 && Math.random() < 0.8) {
+                target = validTargets[Math.floor(Math.random() * validTargets.length)];
+            } else {
+                // Attaque directe si possible
+                if (Math.random() < 0.6) {
+                    target = null;
+                } else {
+                    const frontTargets = gameState.player.board.slice(0, 2).filter(c => c);
+                    target = frontTargets[Math.floor(Math.random() * frontTargets.length)];
+                }
+            }
+        }
+
+        createAttackAnimation(card, target, () => {
+            if (target) {
+                target.hp -= card.atk;
+                if (target.hp <= 0) {
+                    const targetIndex = gameState.player.board.indexOf(target);
+                    gameState.player.board[targetIndex] = null;
+                }
+            } else {
+                gameState.player.hp -= card.atk;
+                if (gameState.player.hp <= 0) endGame("Défaite !");
+            }
+            
+            updateUI();
+            renderBoard();
+            executeStrategicAttack(index + 1);
+        });
+    };
+
+    executeStrategicAttack();
 }
 
 function startPlayerTurn() {
