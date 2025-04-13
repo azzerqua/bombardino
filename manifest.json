@@ -1,10 +1,10 @@
 {
-  "name": "Bombardiro Battle",
-  "short_name": "Bombardiro",
+  "name": "Brainrot Battle",
+  "short_name": "Brainrot Battle",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#000000",
-  "theme_color": "#ffffff",
+  "theme_color": "#00bbff",
   "icons": [
     {
       "src": "icon-192.png",
