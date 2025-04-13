@@ -1802,7 +1802,7 @@ function attack(targetIndex) {
     // Phase 3: Attaques stratégiques
     const attackingCards = gameState.enemy.board
         .map((card, index) => ({card, index}))
-        .filter(({card}) => card && card.canAttack)
+        .filter(({card, index}) => card && card.canAttack && !gameState.enemy.exhaustedCards.includes(index))
         .sort((a, b) => {
             // Priorité aux cartes frontales et ATK élevé
             const aScore = (a.index < 2 ? 2 : 0) + a.card.atk;
@@ -1813,35 +1813,38 @@ function attack(targetIndex) {
     // Exécuter les attaques de manière stratégique
     const executeStrategicAttack = (index = 0) => {
         if (index >= attackingCards.length) {
-            // Phase 4: Activation des effets de support
-            gameState.enemy.board.forEach((card, i) => {
-                if (card && i >= 2) { // Cartes en arrière
-                    card.backLogic?.(card, gameState.enemy.board);
-                }
-            });
+            // Fin du tour ennemi
+            gameState.enemy.exhaustedCards = attackingCards.map(({index}) => index);
             setTimeout(startPlayerTurn, 1000);
             return;
         }
 
         const {card, index: slotIndex} = attackingCards[index];
-        gameState.enemy.exhaustedCards.push(slotIndex);
-
+        
         let target = null;
         if (slotIndex < 2) { // Position avant
             // Cibler les cartes faibles ou attaquer directement
             const validTargets = gameState.player.board
-                .filter(c => c !== null && c.hp <= card.atk);
+                .filter(c => c !== null && c.hp > 0);
             
-            if (validTargets.length > 0 && Math.random() < 0.8) {
-                target = validTargets[Math.floor(Math.random() * validTargets.length)];
+            if (validTargets.length > 0) {
+                // Priorité aux cartes avec moins de HP que l'attaque
+                const weakTargets = validTargets.filter(c => c.hp <= card.atk);
+                target = weakTargets.length > 0 
+                    ? weakTargets[Math.floor(Math.random() * weakTargets.length)]
+                    : validTargets[Math.floor(Math.random() * validTargets.length)];
             } else {
-                // Attaque directe si possible
-                if (Math.random() < 0.6) {
-                    target = null;
-                } else {
-                    const frontTargets = gameState.player.board.slice(0, 2).filter(c => c);
-                    target = frontTargets[Math.floor(Math.random() * frontTargets.length)];
-                }
+                // Attaque directe si pas de cible
+                target = null;
+            }
+        } else {
+            // Cartes en position arrière ne peuvent attaquer que si aucune carte ennemie en position avant
+            const frontTargets = gameState.player.board.slice(0, 2).filter(c => c);
+            if (frontTargets.length === 0) {
+                target = null; // Attaque directe
+            } else {
+                // Attaquer une carte ennemie en position avant
+                target = frontTargets[Math.floor(Math.random() * frontTargets.length)];
             }
         }
 
@@ -1854,7 +1857,10 @@ function attack(targetIndex) {
                 }
             } else {
                 gameState.player.hp -= card.atk;
-                if (gameState.player.hp <= 0) endGame("Défaite !");
+                if (gameState.player.hp <= 0) {
+                    endGame("Défaite !");
+                    return;
+                }
             }
             
             updateUI();
@@ -1863,11 +1869,15 @@ function attack(targetIndex) {
         });
     };
 
-    executeStrategicAttack();
+    if (attackingCards.length > 0) {
+        executeStrategicAttack();
+    } else {
+        setTimeout(startPlayerTurn, 1000);
+    }
 }
 
 function startPlayerTurn() {
-  updateUltimateProgress(); // <-- Ajoutez cette ligne
+  updateUltimateProgress();
 
   gameState.turn = 'player';
   
@@ -1875,18 +1885,26 @@ function startPlayerTurn() {
   if (gameState.player.maxMana < 10) {
     gameState.player.maxMana++;
   }
-  gameState.player.mana = gameState.player.maxMana; // Cette ligne était manquante
+  gameState.player.mana = gameState.player.maxMana;
   
   // Réinitialiser les cartes alliées
   gameState.player.board.forEach((card, index) => {
     if (card) {
       card.canAttack = true;
-      gameState.player.exhaustedCards = gameState.player.exhaustedCards.filter(i => i !== index);
     }
   });
+  gameState.player.exhaustedCards = [];
 
-    // Pioche automatique en début de tour
-    if (gameState.player.hand.length < 5 && gameState.player.deck.length > 0) {
+  // Réinitialiser les cartes ennemies pour le prochain tour
+  gameState.enemy.board.forEach(card => {
+    if (card) {
+      card.canAttack = true;
+    }
+  });
+  gameState.enemy.exhaustedCards = [];
+
+  // Pioche automatique en début de tour
+  if (gameState.player.hand.length < 5 && gameState.player.deck.length > 0) {
     drawCardToHand();
   }
 
