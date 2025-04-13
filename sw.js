@@ -1,15 +1,22 @@
+const assetsToCache = [
+  // Fichiers statiques
+  './',
+  'index.html',
+  'manifest.json',
+  'sw.js',
+  'icon-192.png',
+  'icon-512.png'
+];
+
+// Ajout dynamique des images
+const imageContext = require.context('../img/', true, /\.(webp|png|jpg|svg)$/);
+imageContext.keys().forEach(image => {
+  assetsToCache.push(`img/${image.split('/').pop()}`);
+});
+
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open('bombardiro-cache').then(cache => {
-      return cache.addAll([
-        './',
-        'index.html',
-        'manifest.json',
-        'sw.js',
-        'icon-192.png',
-        'icon-512.png'
-      ]);
-    })
+    caches.open('bombardiro-cache').then(cache => cache.addAll(assetsToCache))
   );
 });
 
